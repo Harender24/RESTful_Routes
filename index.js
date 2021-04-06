@@ -10,6 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 // To parse incoming JSON in POST request body:
 app.use(express.json());
 
+// Views folder and EJS setup:
 app.set('view engine', 'ejs');
 
 // Our fake database:
@@ -57,6 +58,15 @@ app.post('/comments', (req, res) => {
   const { username, comment } = req.body;
   comments.push({ username, comment, id: uuid() });
   res.redirect('/comments');
+});
+
+// *******************************************
+// SHOW - details about one particular comment
+// *******************************************
+app.get('/comments/:id', (req, res) => {
+  const { id } = req.params;
+  const comment = comments.find((c) => c.id === id);
+  res.render('comments/show', { comment });
 });
 
 app.listen(port, () => {
