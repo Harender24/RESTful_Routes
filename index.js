@@ -1,14 +1,18 @@
+var methodOverride = require('method-override');
+// For generating ID's
+const { v4: uuid } = require('uuid');
+
 const express = require('express');
 const app = express();
 const port = 3000;
-
-// For generating ID's
-const { v4: uuid } = require('uuid');
 
 //To parse form data in POST request body:
 app.use(express.urlencoded({ extended: true }));
 // To parse incoming JSON in POST request body:
 app.use(express.json());
+
+// To 'fake' put/patch/delete requests:
+app.use(methodOverride('_method'));
 
 // Views folder and EJS setup:
 app.set('view engine', 'ejs');
@@ -67,6 +71,30 @@ app.get('/comments/:id', (req, res) => {
   const { id } = req.params;
   const comment = comments.find((c) => c.id === id);
   res.render('comments/show', { comment });
+});
+
+// *******************************************
+// EDIT - renders a form to edit a comment
+// *******************************************
+app.get('/comments/:id/edit', (req, res) => {
+  const { id } = req.params;
+  const comment = comments.find((c) => c.id === id);
+  res.render('comments/edit', { comment });
+});
+
+// *******************************************
+// UPDATE - updates a particular comment
+// *******************************************
+app.patch('/comments/:id', (req, res) => {
+  const { id } = req.params;
+  const newComment = comments.find((c) => c.id === id);
+
+  // get new text from req.body
+  const newCommentText = req.body.comment;
+  //update the comment with the data from req.body:
+  newComment.comment = newCommentText;
+  //redirect back to index (or wherever you want)
+  res.redirect('/comments');
 });
 
 app.listen(port, () => {
