@@ -1,4 +1,5 @@
-var methodOverride = require('method-override');
+const path = require('path');
+const methodOverride = require('method-override');
 // For generating ID's
 const { v4: uuid } = require('uuid');
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 
 // Views folder and EJS setup:
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Our fake database:
@@ -97,6 +99,21 @@ app.patch('/comments/:id', (req, res) => {
   res.redirect('/comments');
 });
 
+// *******************************************
+// DELETE/DESTROY- removes a single comment
+// *******************************************
+app.delete('/comments/:id', (req, res) => {
+  const { id } = req.params;
+  comments = comments.filter((c) => c.id !== id);
+  res.redirect('/comments');
+});
+
 app.listen(port, () => {
   console.log(`lisening at ${port}`);
 });
+
+// GET /comments - list all comments
+// POST /comments - Create a new comment
+// GET /comments/:id - Get one comment (using ID)
+// PATCH /comments/:id - Update one comment
+// DELETE /comments/:id - Destroy one comment
